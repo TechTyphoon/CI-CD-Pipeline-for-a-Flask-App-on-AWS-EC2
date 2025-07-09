@@ -13,6 +13,14 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v3
 
+    - name: Test SSH Connection
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.AWS_HOST }}
+        username: ${{ secrets.AWS_USERNAME }}
+        key: ${{ secrets.AWS_SSH_KEY }}
+        script: echo "✅ SSH Connection Successful"
+
     - name: Copy files to EC2 via SSH
       uses: appleboy/scp-action@v0.1.7
       with:
