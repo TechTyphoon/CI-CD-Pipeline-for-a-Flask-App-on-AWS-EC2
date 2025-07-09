@@ -21,13 +21,13 @@ jobs:
         key: ${{ secrets.AWS_SSH_KEY }}
         script: echo "✅ SSH Connection Successful"
 
-    - name: Copy files to EC2 via SSH
+    - name: Copy files to EC2 via SCP
       uses: appleboy/scp-action@v0.1.7
       with:
         host: ${{ secrets.AWS_HOST }}
         username: ${{ secrets.AWS_USERNAME }}
         key: ${{ secrets.AWS_SSH_KEY }}
-        source: "."
+        source: "app.py,requirements.txt,.github"
         target: "~/CI-CD-Pipeline-for-a-Flask-App-on-AWS-EC2"
 
     - name: Run deploy commands on EC2
@@ -39,6 +39,5 @@ jobs:
         script: |
           cd ~/CI-CD-Pipeline-for-a-Flask-App-on-AWS-EC2
           source venv/bin/activate
-          git pull origin main
           pip install -r requirements.txt
           nohup python app.py > output.log 2>&1 &
