@@ -17,10 +17,16 @@ jobs:
         username: ${{ secrets.AWS_USERNAME }}
         key: ${{ secrets.AWS_SSH_KEY }}
         script: |
-          cd ~/CI-CD-Pipeline-for-a-Flask-App-on-AWS-EC2 || git clone https://github.com/TechTyphoon/CI-CD-Pipeline-for-a-Flask-App-on-AWS-EC2.git ~/CI-CD-Pipeline-for-a-Flask-App-on-AWS-EC2
+          # Remove the old, broken directory to ensure a clean start
+          rm -rf ~/CI-CD-Pipeline-for-a-Flask-App-on-AWS-EC2
+
+          # Clone a fresh copy of the repository from GitHub
+          git clone https://github.com/TechTyphoon/CI-CD-Pipeline-for-a-Flask-App-on-AWS-EC2.git ~/CI-CD-Pipeline-for-a-Flask-App-on-AWS-EC2
+          
+          # Navigate into the newly cloned directory
           cd ~/CI-CD-Pipeline-for-a-Flask-App-on-AWS-EC2
 
-          git pull origin main
+          # Now, run the deployment commands
           export PATH=$PATH:/home/ec2-user/.local/bin
           pkill -f "flask run" || true
           python3 -m pip install -r requirements.txt
