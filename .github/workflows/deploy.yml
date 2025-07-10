@@ -1,4 +1,4 @@
-name: Deploy Flask App to AWS EC2
+name: Test EC2 Connection
 
 on:
   push:
@@ -6,41 +6,21 @@ on:
       - main
 
 jobs:
-  deploy:
+  test-connection:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Connect and Deploy
+    - name: Run Simple Test Commands on EC2
       uses: appleboy/ssh-action@master
       with:
         host: ${{ secrets.AWS_HOST }}
         username: ${{ secrets.AWS_USERNAME }}
         key: ${{ secrets.AWS_SSH_KEY }}
         script: |
-          # Go to the project directory. If it doesn't exist, clone it from GitHub.
-          cd ~/CI-CD-Pipeline-for-a-Flask-App-on-AWS-EC2 || git clone https://github.com/TechTyphoon/CI-CD-Pipeline-for-a-Flask-App-on-AWS-EC2.git ~/CI-CD-Pipeline-for-a-Flask-App-on-AWS-EC2
-          cd ~/CI-CD-Pipeline-for-a-Flask-App-on-AWS-EC2
-          
-          # Run all deployment steps and save output to a log file
-          {
-            echo "--- (1) Pulling latest code from GitHub ---"
-            git pull origin main
-
-            echo "--- (2) Setting environment PATH ---"
-            export PATH=$PATH:/home/ec2-user/.local/bin
-
-            echo "--- (3) Killing any old running process ---"
-            pkill -f "flask run" || echo "No process to kill."
-
-            echo "--- (4) Installing Python dependencies ---"
-            python3 -m pip install -r requirements.txt
-
-            echo "--- (5) Starting the Flask application ---"
-            nohup python3 -m flask run --host=0.0.0.0 --port=5000 &
-            
-            echo "--- (6) Deployment script finished ---"
-          } > deploy_log.txt 2>&1
-          
-          # Print the entire log to the GitHub Actions output for debugging
-          echo "--- Deployment Log ---"
-          cat deploy_log.txt
+          echo "--- Test: Starting simple commands ---"
+          echo "Hello from EC2!"
+          echo "Current user is:"
+          whoami
+          echo "Current directory is:"
+          pwd
+          echo "--- Test finished ---"
