@@ -38,9 +38,11 @@ jobs:
         key: ${{ secrets.AWS_SSH_KEY }}
         script: |
           cd ~/CI-CD-Pipeline-for-a-Flask-App-on-AWS-EC2
+          # Set the path to include local user binaries
+          export PATH=$PATH:/home/ec2-user/.local/bin
           # Stop any old flask process
-          pkill -f flask || true
-          # Install/update dependencies
-          pip install -r requirements.txt
+          pkill -f "flask run" || true
+          # Install/update dependencies using the specific python3 version
+          python3 -m pip install -r requirements.txt
           # Start the app in the background
           nohup python3 -m flask run --host=0.0.0.0 --port=5000 &
