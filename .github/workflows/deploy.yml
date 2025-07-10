@@ -10,44 +10,37 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
-
-    - name: Run deploy commands on EC2
+    - name: Connect and Deploy
       uses: appleboy/ssh-action@master
       with:
         host: ${{ secrets.AWS_HOST }}
         username: ${{ secrets.AWS_USERNAME }}
         key: ${{ secrets.AWS_SSH_KEY }}
         script: |
+          # Go to the project directory. If it doesn't exist, clone it from GitHub.
+          cd ~/CI-CD-Pipeline-for-a-Flask-App-on-AWS-EC2 || git clone https://github.com/TechTyphoon/CI-CD-Pipeline-for-a-Flask-App-on-AWS-EC2.git ~/CI-CD-Pipeline-for-a-Flask-App-on-AWS-EC2
           cd ~/CI-CD-Pipeline-for-a-Flask-App-on-AWS-EC2
-          # Run all commands and save all output to a log file
+          
+          # Run all deployment steps and save output to a log file
           {
-            echo "--- Setting PATH ---"
+            echo "--- (1) Pulling latest code from GitHub ---"
+            git pull origin main
+
+            echo "--- (2) Setting environment PATH ---"
             export PATH=$PATH:/home/ec2-user/.local/bin
-            echo "PATH is now: $PATH"
-            echo "--- Killing old process ---"
-            pkill -f "flask run" || echo "pkill failed or no process was running."
-            echo "--- Installing dependencies ---"
+
+            echo "--- (3) Killing any old running process ---"
+            pkill -f "flask run" || echo "No process to kill."
+
+            echo "--- (4) Installing Python dependencies ---"
             python3 -m pip install -r requirements.txt
-            echo "--- Starting new process ---"
+
+            echo "--- (5) Starting the Flask application ---"
             nohup python3 -m flask run --host=0.0.0.0 --port=5000 &
-            echo "--- Script finished ---"
+            
+            echo "--- (6) Deployment script finished ---"
           } > deploy_log.txt 2>&1
-
-    - name: Download Debug Log from EC2
-      if: always() # This makes the step run even if the previous one fails
-      uses: appleboy/scp-action@v0.1.7
-      with:
-        host: ${{ secrets.AWS_HOST }}
-        username: ${{ secrets.AWS_USERNAME }}
-        key: ${{ secrets.AWS_SSH_KEY }}
-        port: 22
-        source: "~/CI-CD-Pipeline-for-a-Flask-App-on-AWS-EC2/deploy_log.txt"
-        target: "."
-
-    - name: Display Debug Log
-      if: always() # This also runs regardless of failure
-      run: |
-        echo "--- Contents of deploy_log.txt from the server ---"
-        cat deploy_log.txt
+          
+          # Print the entire log to the GitHub Actions output for debugging
+          echo "--- Deployment Log ---"
+          cat deploy_log.txt
