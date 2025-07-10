@@ -1,41 +1,124 @@
-# CI/CD Pipeline for Flask App on AWS EC2
+<p align="center">
+  <img src="https://img.shields.io/github/actions/workflow/status/TechTyphoon/CI-CD-Pipeline-for-a-Flask-App-on-AWS-EC2/test.yml?label=Tests&logo=github" alt="Test Status">
+  <img src="https://img.shields.io/github/actions/workflow/status/TechTyphoon/CI-CD-Pipeline-for-a-Flask-App-on-AWS-EC2/deploy.yml?label=Deploy&logo=github" alt="Deploy Status">
+  <img src="https://img.shields.io/github/license/TechTyphoon/CI-CD-Pipeline-for-a-Flask-App-on-AWS-EC2?color=blue" alt="MIT License">
+  <img src="https://img.shields.io/badge/Docker-Ready-blue?logo=docker" alt="Docker Ready">
+</p>
 
-## 🚀 Overview
-This project demonstrates a full CI/CD pipeline using GitHub Actions to deploy a Flask web app to AWS EC2.
+<h1 align="center">CI/CD Pipeline for Flask App on AWS EC2</h1>
 
-## 🧪 How It Works
-1. Code pushed to GitHub triggers GitHub Actions.
-2. It SSHs into EC2 and deploys the app.
-3. App updates live automatically.
+<p align="center">
+  ⚙️ Fully automated CI/CD pipeline with GitHub Actions, Docker, Gunicorn, and AWS EC2. <br>
+  🚀 Production-ready. Open-source. Scalable. Resume-worthy.
+</p>
 
-## 📂 Files
-- app.py
-- requirements.txt
-- .github/workflows/deploy.yml (will be created in Phase 2)
+---
 
-## 🐳 Docker Deployment
+## 🚀 TL;DR
 
-1. Build and run with Docker:
-   ```bash
-   docker build -t flask-cicd-app .
-   docker run -d -p 5000:5000 --restart always --name flask-cicd-app flask-cicd-app
-   ```
-2. Or use docker-compose:
-   ```bash
-   docker-compose up -d
-   ```
+A **Flask web app** that automatically tests and deploys to an **AWS EC2** instance using **GitHub Actions**, with **Docker**, **Gunicorn**, **systemd**, and **log rotation**. Built for speed, reliability, and DevOps skill showcase.
 
-## 🖥️ EC2 (Non-Docker) Deployment
+---
 
-1. Run `setup.sh` to install Python, create venv, install requirements, and start Gunicorn via systemd.
-2. Systemd service: `gunicorn-flask.service` runs Gunicorn in `/home/ubuntu/CI-CD-Pipeline-for-a-Flask-App-on-AWS-EC2` and logs to `/var/log/gunicorn/`.
-3. Log rotation: see `gunicorn-logrotate` for `/var/log/gunicorn/*.log`.
+## 🌟 Features
 
-## 🤖 CI/CD Pipeline (GitHub Actions)
+- ✅ Fully Automated CI/CD (GitHub Actions)
+- 🐳 Dockerized + Docker Compose support
+- 🖥️ AWS EC2 Production Deployment
+- 🔥 Gunicorn + systemd + logrotate
+- 💉 Health Check Endpoint (`/health`)
+- 🧪 Pytest-based Testing
+- 📦 Secure Deploy via SSH Key Secrets
+- 📈 Uptime Monitoring via `uptime.sh`
 
-- On push, workflow runs tests, builds (optionally Docker), and deploys to EC2.
-- Supports both Docker and non-Docker deploys.
-- Add secrets for EC2 SSH and (optionally) Docker registry.
+---
 
-## 👨‍💻 Author
-Mahendra Reddy
+## 🧰 Tech Stack
+
+- Python 3.11 / Flask
+- Docker + Docker Compose
+- Gunicorn (WSGI Server)
+- GitHub Actions (CI/CD)
+- AWS EC2 (Ubuntu)
+- systemd + logrotate
+- SSH Key Authentication
+- pytest
+
+---
+
+## 🔐 GitHub Secrets Required
+
+| Secret Key      | Description                          |
+|-----------------|--------------------------------------|
+| `AWS_HOST`      | Public IP of your EC2 instance       |
+| `AWS_USERNAME`  | Usually `ubuntu`                     |
+| `AWS_SSH_KEY`   | Your private `.pem` key content      |
+
+---
+
+## 🛠️ Local Development
+
+
+```bash
+git clone https://github.com/TechTyphoon/CI-CD-Pipeline-for-a-Flask-App-on-AWS-EC2.git
+cd CI-CD-Pipeline-for-a-Flask-App-on-AWS-EC2
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+python app.py
+```
+
+### 🐳 Docker Deployment
+```bash
+docker build -t flask-cicd-app .
+docker run -d -p 5000:5000 --restart always --name flask-cicd-app flask-cicd-app
+```
+
+### Or with Compose
+```bash
+docker-compose up -d
+```
+
+### ☁️ EC2 Production (Non-Docker)
+```bash
+chmod +x setup.sh
+./setup.sh
+```
+Gunicorn service: `gunicorn-flask.service`
+Logs: `/var/log/gunicorn/output.log`
+Logrotate: `gunicorn-logrotate`
+
+---
+
+## 🤖 GitHub Actions CI/CD Workflow
+On Push to main:
+- ✅ Runs pytest
+- ✅ Connects to EC2 via SSH
+- ✅ Copies files securely
+- ✅ Installs dependencies
+- ✅ Restarts the Flask app via systemd
+
+## 🧪 Health Check
+- Endpoint: `/health`
+- Returns: `200 OK` if app is healthy
+- Used In: GitHub Actions, `uptime.sh`, and Docker `HEALTHCHECK`
+
+## 📸 Screenshots
+| Architecture Diagram | Deployed App | CI/CD Pipeline Flow |
+|---|---|---|
+| ![arch](screenshots/architecture-diagram.png) | ![app](screenshots/deployed-app.png) | ![cicd](screenshots/cicd-pipeline-flow.png) |
+
+## 🤝 Contributing
+We welcome PRs and issues! See [CONTRIBUTING.md](CONTRIBUTING.md)
+
+## 📜 License
+This project is licensed under the MIT License.
+
+## 👤 Author
+Made with ❤️ by Mahendra Reddy  
+🔗 [GitHub](https://github.com/TechTyphoon) | [LinkedIn](https://www.linkedin.com/in/your-linkedin)
+
+## 📣 Share It!
+⭐ Star the repo  
+🔄 Fork it  
+📢 Share with #DevOps, #AWS, #CI/CD on LinkedIn and Twitter
