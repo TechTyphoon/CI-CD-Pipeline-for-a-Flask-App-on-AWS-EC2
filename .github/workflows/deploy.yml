@@ -38,7 +38,9 @@ jobs:
         key: ${{ secrets.AWS_SSH_KEY }}
         script: |
           cd ~/CI-CD-Pipeline-for-a-Flask-App-on-AWS-EC2
-          # Stop any running Flask app (ignore error if not running)
-          pkill -f "flask run" || true
-          # Start the Flask app in the background, accessible on all interfaces
-          nohup flask run --host=0.0.0.0 --port=5000 > output.log 2>&1 &
+          # Stop any old flask process
+          pkill -f flask || true
+          # Install/update dependencies
+          pip install -r requirements.txt
+          # Start the app in the background
+          nohup python3 -m flask run --host=0.0.0.0 --port=5000 &
