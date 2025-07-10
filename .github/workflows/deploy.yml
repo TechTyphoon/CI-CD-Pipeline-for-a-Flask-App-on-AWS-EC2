@@ -15,8 +15,11 @@ jobs:
 
     - name: Setup SSH Key
       run: |
-        echo "${{ secrets.AWS_SSH_KEY }}" > key.pem
+        echo "$AWS_SSH_KEY" | tr -d '\r' | awk 'NF {sub(/\r/, ""); printf "%s\n",$0;}' > key.pem
         chmod 600 key.pem
+      shell: bash
+      env:
+        AWS_SSH_KEY: ${{ secrets.AWS_SSH_KEY }}
 
     - name: Deploy via Manual SSH
       run: |
