@@ -38,11 +38,18 @@ jobs:
         key: ${{ secrets.AWS_SSH_KEY }}
         script: |
           cd ~/CI-CD-Pipeline-for-a-Flask-App-on-AWS-EC2
-          # Set the path to include local user binaries
-          export PATH=$PATH:/home/ec2-user/.local/bin
-          # Stop any old flask process
-          pkill -f "flask run" || true
-          # Install/update dependencies using the specific python3 version
-          python3 -m pip install -r requirements.txt
-          # Start the app in the background
-          nohup python3 -m flask run --host=0.0.0.0 --port=5000 &
+          # Run all commands and save all output to a log file
+          {
+            echo "--- Setting PATH ---"
+            export PATH=$PATH:/home/ec2-user/.local/bin
+            echo "PATH is now: $PATH"
+            echo "--- Killing old process ---"
+            pkill -f "flask run" || echo "pkill failed or no process was running."
+            echo "--- Installing dependencies ---"
+            python3 -m pip install -r requirements.txt
+            echo "--- Starting new process ---"
+            nohup python3 -m flask run --host=0.0.0.0 --port=5000 &
+            echo "--- Script finished ---"
+          } > deploy_log.txt 2>&1
+          # Print the contents of the log file to the GitHub Actions output
+          cat deploy_log.txt
