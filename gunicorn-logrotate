@@ -1,0 +1,13 @@
+/var/log/gunicorn/*.log {
+    daily
+    missingok
+    rotate 14
+    compress
+    delaycompress
+    notifempty
+    create 0640 ubuntu adm
+    sharedscripts
+    postrotate
+        systemctl restart gunicorn-flask.service > /dev/null 2>&1 || true
+    endscript
+}

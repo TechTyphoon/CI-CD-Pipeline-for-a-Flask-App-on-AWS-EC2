@@ -1,0 +1,20 @@
+# /etc/systemd/system/gunicorn-flask.service
+# Systemd unit file for running Gunicorn with a Flask app
+[Unit]
+Description=Gunicorn instance to serve Flask app
+After=network.target
+
+[Service]
+User=ec2-user
+Group=www-data
+WorkingDirectory=/home/ec2-user/CI-CD-Pipeline-for-a-Flask-App-on-AWS-EC2
+Environment="PATH=/home/ec2-user/CI-CD-Pipeline-for-a-Flask-App-on-AWS-EC2/venv/bin"
+ExecStart=/home/ec2-user/CI-CD-Pipeline-for-a-Flask-App-on-AWS-EC2/venv/bin/gunicorn -w 3 -b 0.0.0.0:5000 app:app
+Restart=always
+RestartSec=5
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=gunicorn-flask
+
+[Install]
+WantedBy=multi-user.target
