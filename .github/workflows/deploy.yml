@@ -13,23 +13,6 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v3
 
-    - name: Test SSH Connection
-      uses: appleboy/ssh-action@master
-      with:
-        host: ${{ secrets.AWS_HOST }}
-        username: ${{ secrets.AWS_USERNAME }}
-        key: ${{ secrets.AWS_SSH_KEY }}
-        script: echo "✅ SSH Connection Successful"
-
-    - name: Copy files to EC2 via SCP
-      uses: appleboy/scp-action@v0.1.7
-      with:
-        host: ${{ secrets.AWS_HOST }}
-        username: ${{ secrets.AWS_USERNAME }}
-        key: ${{ secrets.AWS_SSH_KEY }}
-        source: "app.py,requirements.txt,.github"
-        target: "~/CI-CD-Pipeline-for-a-Flask-App-on-AWS-EC2"
-
     - name: Run deploy commands on EC2
       uses: appleboy/ssh-action@master
       with:
@@ -51,5 +34,20 @@ jobs:
             nohup python3 -m flask run --host=0.0.0.0 --port=5000 &
             echo "--- Script finished ---"
           } > deploy_log.txt 2>&1
-          # Print the contents of the log file to the GitHub Actions output
-          cat deploy_log.txt
+
+    - name: Download Debug Log from EC2
+      if: always() # This makes the step run even if the previous one fails
+      uses: appleboy/scp-action@v0.1.7
+      with:
+        host: ${{ secrets.AWS_HOST }}
+        username: ${{ secrets.AWS_USERNAME }}
+        key: ${{ secrets.AWS_SSH_KEY }}
+        port: 22
+        source: "~/CI-CD-Pipeline-for-a-Flask-App-on-AWS-EC2/deploy_log.txt"
+        target: "."
+
+    - name: Display Debug Log
+      if: always() # This also runs regardless of failure
+      run: |
+        echo "--- Contents of deploy_log.txt from the server ---"
+        cat deploy_log.txt
