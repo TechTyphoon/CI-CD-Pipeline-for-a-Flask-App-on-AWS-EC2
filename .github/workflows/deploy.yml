@@ -1,4 +1,4 @@
-name: Test EC2 Connection
+name: Deploy Flask App to AWS EC2
 
 on:
   push:
@@ -6,21 +6,22 @@ on:
       - main
 
 jobs:
-  test-connection:
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Run Simple Test Commands on EC2
+    - name: Connect and Deploy
       uses: appleboy/ssh-action@master
       with:
         host: ${{ secrets.AWS_HOST }}
         username: ${{ secrets.AWS_USERNAME }}
         key: ${{ secrets.AWS_SSH_KEY }}
         script: |
-          echo "--- Test: Starting simple commands ---"
-          echo "Hello from EC2!"
-          echo "Current user is:"
-          whoami
-          echo "Current directory is:"
-          pwd
-          echo "--- Test finished ---"
+          cd ~/CI-CD-Pipeline-for-a-Flask-App-on-AWS-EC2 || git clone https://github.com/TechTyphoon/CI-CD-Pipeline-for-a-Flask-App-on-AWS-EC2.git ~/CI-CD-Pipeline-for-a-Flask-App-on-AWS-EC2
+          cd ~/CI-CD-Pipeline-for-a-Flask-App-on-AWS-EC2
+
+          git pull origin main
+          export PATH=$PATH:/home/ec2-user/.local/bin
+          pkill -f "flask run" || true
+          python3 -m pip install -r requirements.txt
+          nohup python3 -m flask run --host=0.0.0.0 --port=5000 &
